@@ -74,6 +74,10 @@
   color:#000000;
 }
 
+.teclado .reset:hover {
+  background-color: #ffff00;
+}
+
 .calculadora .display {
   margin-bottom: 20px;
 }
