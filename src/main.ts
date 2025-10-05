@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="teclado">
           <button class="delete span-two">DEL</button>
           <button class="reset">C</button>
+          <button class="operation" data-action="sign">+/-</button>
+          <button class="operation" data-action="square">x²</button>
+          <button class="operation" data-action="sqrt">√x</button>
+          <button class="operation" data-action="inverse">1/x</button>
           <button class="operation" data-action="+">+</button>
           <button class="number" data-value="7">7</button>
           <button class="number" data-value="8">8</button>
@@ -118,6 +122,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const executeUnaryOperation = (action: string): void => {
+    const num = parseFloat(currentInput);
+    let result: number | string;
+    
+    switch(action){
+      case 'sign':
+        if(currentInput !== '0'){
+          result = currentInput.startsWith('-') ? currentInput.substring(1) : '-' + currentInput;
+          currentInput = result;
+          (document.querySelector('.display-input') as HTMLInputElement)!.value = currentInput;
+        }
+        return;
+      case 'square':
+        result = num * num;
+        break;
+      case 'sqrt':
+        if(num >= 0){
+          result = Math.sqrt(num);
+        } else {
+          result = 'Error';
+        }
+        break;
+      case 'inverse':
+        if(num !== 0){
+          result = 1 / num;
+        } else {
+          result = 'Error';
+        }
+        break;
+      default:
+        return;
+    }
+    
+    currentInput = result.toString();
+    (document.querySelector('.display-input') as HTMLInputElement)!.value = currentInput;
+    shouldResetInput = true;
+  };
+
   
   const operationButtons = document.getElementsByClassName('operation');
   if(operationButtons){
@@ -125,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
       button.addEventListener('click', (event) => {
         const action = (event.target as HTMLElement).dataset.action;
         
+        // Verificar si es una operación unaria
+        if(action === 'sign' || action === 'square' || action === 'sqrt' || action === 'inverse'){
+          executeUnaryOperation(action);
+          return;
+        }
+        
+        // Operaciones binarias (+, -, *, /)
         if(operation && !shouldResetInput){
           // Si ya hay una operación pendiente y se ha introducido el segundo operando,
           // calcular el resultado antes de establecer la nueva operación
